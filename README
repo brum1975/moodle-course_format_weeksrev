@@ -1,0 +1,7 @@
+This is a clone of the Moodle weeks course format except the weeks are listed in reverse order.
+
+All of the hard work was done by Sam Hemelryk, I have just reversed a few values.
+
+All future weeks are hidden from the student view so that the current week is shown at the top of the list.
+
+As a teacher you can see future weeks and should leave them unhidden so that they do become visible when that week arrives.
