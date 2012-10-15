@@ -18,14 +18,13 @@
  * Version details
  *
  * @package    format
- * @subpackage weeks
+ * @subpackage weeksrev
  * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2012091000;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011120100;        // Requires this Moodle version
-$plugin->component = 'format_weeksrev';    // Full name of the plugin (used for diagnostics)
-$plugin->release = '2.2 (Build: 2012091000)'; 
+$plugin->version   = 2012101500;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2012061700;        // Requires this Moodle version.
+$plugin->component = 'format_weeksrev';    // Full name of the plugin (used for diagnostics).

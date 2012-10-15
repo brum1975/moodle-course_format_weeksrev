@@ -18,11 +18,16 @@
 /**
  * Strings for component 'format_weeks', language 'en', branch 'MOODLE_20_STABLE'
  *
- * @package   format_weeks
+ * @package   format_weeksrev
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['currentsection'] = 'This week';
 $string['sectionname'] = 'Week';
-$string['pluginname'] = 'Weekly format reversed';
+$string['pluginname'] = 'Reverse weekly format';
 $string['section0name'] = 'General';
+$string['page-course-view-weeks'] = 'Any course main page in weeks format';
+$string['page-course-view-weeks-x'] = 'Any course page in weeks format';
+$string['hidefromothers'] = 'Hide week';
+$string['showfromothers'] = 'Show week';

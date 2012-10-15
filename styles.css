@@ -1,6 +1,12 @@
-.course-content ul.weeks {margin:0;}
-.course-content ul.weeks li.section {list-style: none;margin:5px 0 0 0;padding:0;}
-.course-content ul.weeks li.section .content {margin:0 40px;}
-.course-content ul.weeks li.section .left {width:40px;float:left;text-align:center;}
-.course-content ul.weeks li.section .right {width:40px;float:right;text-align:center;}
+.course-content ul.weeksrev {margin:0;}
+.course-content ul.weeksrev li.section {list-style: none;margin:5px 0 0 0;padding:0;border: 1px solid #DDDDDD;}
+.course-content ul.weeksrev li.section .content {margin:0 40px;background-color: #FAFAFA;padding: 5px 10px;}
+.course-content ul.weeksrev li.section .left {width:40px;float:left;text-align:center;padding: 5px 0;}
+.course-content ul.weeksrev li.section .right {width:40px;float:right;text-align:center;padding: 5px 0;}
 .jumpmenu {text-align:center;}
+
+.course-content ul.weeksrev li.section .content h3 {
+    color: #777777;
+    font-weight: normal;
+    margin: 0;
+}
