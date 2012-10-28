@@ -10,3 +10,21 @@
     font-weight: normal;
     margin: 0;
 }
+#futureweeks {
+    border: 3px dashed #E89696;
+    margin: 5px;
+    padding: 5px;
+}
+#futureweeks legend {
+    color: #E89696;
+    padding: 3px;
+    border: 1px solid;
+}
+#page-course-view-weeksrev.editing #page-content:before {
+    background: none repeat scroll 0 0 #FFFFCC;
+    content: "Weeks will display in reverse order when finished editing";
+    float: right;
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+}

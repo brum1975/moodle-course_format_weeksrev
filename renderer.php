@@ -112,7 +112,8 @@ class format_weeksrev_renderer extends format_section_renderer_base {
             }
             echo $this->section_footer();
         }
-
+        echo '<fieldset id="futureweeks"><legend>'.get_string('futureweeks', 'format_weeksrev').'</legend>';
+        $futureended = false;
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
         for ($section = $course->numsections; $section >= 1; $section--) {
             if (!empty($sections[$section])) {
@@ -133,6 +134,10 @@ class format_weeksrev_renderer extends format_section_renderer_base {
             $thissectiondates = format_weeksrev_get_section_dates($thissection, $course);
             if ($thissectiondates->start < time()){
                 $current = true;
+                if (!$futureended){
+                    echo '</fieldset>';
+                    $futureended = true;
+                }
             } else {
                 $current = false;
             }
