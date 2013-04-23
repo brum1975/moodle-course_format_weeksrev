@@ -31,3 +31,5 @@ $string['page-course-view-weeks'] = 'Any course main page in weeks format';
 $string['page-course-view-weeks-x'] = 'Any course page in weeks format';
 $string['hidefromothers'] = 'Hide week';
 $string['showfromothers'] = 'Show week';
+$string['futureweeks'] = 'Future Weeks (Hidden from students)';
+$string['futureweek'] = 'Future Week (Hidden from students)';
