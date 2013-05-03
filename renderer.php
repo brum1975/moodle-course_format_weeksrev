@@ -71,10 +71,8 @@ class format_weeksrev_renderer extends format_section_renderer_base {
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
         global $PAGE;
-
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
-
         $context = context_course::instance($course->id);
         // Title with completion help icon.
         $completioninfo = new completion_info($course);
@@ -171,48 +169,14 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                 $ended = true;
             }  
         }
-
-        if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
-            // Print stealth sections if present.
-            foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $course->numsections or empty($modinfo->sections[$section])) {
-                    // this is not stealth section or it is empty
-                    continue;
-                }
-                echo $this->stealth_section_header($section);
-                print_section($course, $thissection, null, null, true, "100%", false, 0);
-                echo $this->stealth_section_footer();
+		if(!$ended){
+            if($canviewhidden){
+                echo '</fieldset>';
+                
             }
-
-            echo $this->end_section_list();
-
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-
-            // Increase number of sections.
-            $straddsection = get_string('increasesections', 'moodle');
-            $url = new moodle_url('/course/changenumsections.php',
-                array('courseid' => $course->id,
-                      'increase' => true,
-                      'sesskey' => sesskey()));
-            $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-            echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
-
-            if ($course->numsections > 0) {
-                // Reduce number of sections sections.
-                $strremovesection = get_string('reducesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php',
-                    array('courseid' => $course->id,
-                          'increase' => false,
-                          'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_minus', $strremovesection);
-                echo html_writer::link($url, $icon.get_accesshide($strremovesection), array('class' => 'reduce-sections'));
-            }
-
-            echo html_writer::end_tag('div');
-        } else {
-            echo $this->end_section_list();
-        }
-
+            $ended = true;		
+		}
+        echo $this->end_section_list();
     }	
 	
     /**
@@ -365,7 +329,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         $forward = $sectionno + 1;
         while ($forward <= $course->numsections and empty($links['next'])) {
                 $nextsectiondates = course_get_format($course)->get_section_dates($sections[$forward]);
-            //$nextsectiondates = format_weeksrev_get_section_dates($sections[$forward], $course);
             $shownext = $nextsectiondates->start<time();
             if($shownext || $canviewhidden){
                 if ($canviewhidden || $sections[$forward]->uservisible) {
