@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013050201;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2013051100;        // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2012120300;        // Requires this Moodle version.
 $plugin->component = 'format_weeksrev';    // Full name of the plugin (used for diagnostics).
 $plugin->release = '1.1 for Moodle 2.4+';

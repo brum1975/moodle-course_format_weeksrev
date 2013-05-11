@@ -84,8 +84,10 @@ class format_weeksrev_renderer extends format_section_renderer_base {
 
         // Now the list of sections..
         echo $this->start_section_list();
-        
-        $revmodinfo = array_reverse($modinfo->get_section_info_all());//reverse sections
+        $allsections = $modinfo->get_section_info_all();
+        //only require 0 + number of sections in course settings
+        $requiredsections = array_slice($allsections, 0, $course->numsections+1);
+        $revmodinfo = array_reverse($requiredsections);//reverse sections
         array_unshift($revmodinfo,array_pop($revmodinfo));//move section 0 back to top
         $started = $ended = false;        
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
@@ -112,19 +114,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                     $started = true;
                 }
             }
-            if ($section == 0) {
-                // 0-section is displayed a little different then the others
-                if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
-                    echo $this->section_header($thissection, $course, false, 0);
-                    print_section($course, $thissection, null, null, true, "100%", false, 0);
-                    if ($PAGE->user_is_editing()) {
-                        print_section_add_menus($course, 0, null, false, false, 0);
-                    }
-                    echo $this->section_footer();
-                }
-                continue;
-            }
-
             if ($section > $course->numsections) {
                 // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
                 continue;
@@ -167,17 +156,17 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                     
                 }
                 $ended = true;
-            }  
+            }
         }
-		if(!$ended){
+        if(!$ended){
             if($canviewhidden){
                 echo '</fieldset>';
                 
             }
-            $ended = true;		
+            $ended = true;
 		}
         echo $this->end_section_list();
-    }	
+    }
 	
     /**
      * Output the html for a single section page .
@@ -343,8 +332,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
             }
             $forward++;
         }
-
         return $links;
     }
-	
 }
