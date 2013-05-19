@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,18 +16,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Settings used by the lesson module, were moved from mod_edit
  *
  * @package    format
  * @subpackage weeksrev
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ * @copyright  2013 Matthew Cannings
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or late
+ **/
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version   = 2013051900;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2012120300;        // Requires this Moodle version.
-$plugin->component = 'format_weeksrev';    // Full name of the plugin (used for diagnostics).
-$plugin->release = '1.3 for Moodle 2.5+';
-$plugin->maturity  = MATURITY_RC;
+defined('MOODLE_INTERNAL') || die;
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_configcheckbox('forcehide', get_string('forcehidedefault','format_weeksrev'),
+                    '', 1));
+}                  
+                    
+                    
+                    
+?>

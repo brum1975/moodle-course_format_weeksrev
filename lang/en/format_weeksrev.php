@@ -32,4 +32,12 @@ $string['page-course-view-weeks-x'] = 'Any course page in weeks format';
 $string['hidefromothers'] = 'Hide week';
 $string['showfromothers'] = 'Show week';
 $string['futureweeks'] = 'Future Weeks (Hidden from students)';
+$string['futureweeks2'] = 'Future Weeks (Hidden according to conditional access)';
 $string['futureweek'] = 'Future Week (Hidden from students)';
+
+$string['forcehide'] = 'Hide Future Weeks';
+$string['forcehide_help'] = 'Should the course format automatically hide future weeks until they arrive
+ or let user specify the dates based on conditional access. NOTE:For conditional access highlighting will move on even if section not visible';
+$string['forcehidetrue'] = 'Hidden Until Week Arrives';
+$string['forcehidefalse'] = 'Hidden Until Conditional Access Met';
+$string['forcehidedefault'] = 'Should future weeks be hidden by default';

@@ -18,7 +18,7 @@
  * This file contains main class for the course format Weeks
  *
  * @since     2.0
- * @package   format_weeks
+ * @package   format_weeksrev
  * @copyright 2009 Sam Hemelryk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -57,7 +57,7 @@ class format_weeksrev extends format_base {
             return format_string($section->name, true, array('context' => context_course::instance($this->courseid)));
         } else if ($section->section == 0) {
             // Return the general section.
-            return get_string('section0name', 'format_weeks');
+            return get_string('section0name', 'format_weeksrev');
         } else {
             $dates = $this->get_section_dates($section);
 
@@ -189,10 +189,11 @@ class format_weeksrev extends format_base {
     /**
      * Definitions of the additional options that this course format uses for course
      *
-     * Weeks format uses the following options:
+     * Weeksrev format uses the following options:
      * - coursedisplay
      * - numsections
      * - hiddensections
+     * - forcehide
      *
      * @param bool $foreditform
      * @return array of options
@@ -212,6 +213,10 @@ class format_weeksrev extends format_base {
                 ),
                 'coursedisplay' => array(
                     'default' => $courseconfig->coursedisplay,
+                    'type' => PARAM_INT,
+                ),
+                'forcehide' => array(
+                    'default' => 1,
                     'type' => PARAM_INT,
                 ),
             );
@@ -255,6 +260,18 @@ class format_weeksrev extends format_base {
                     ),
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
+                ),
+                'forcehide' => array(
+                    'label' => new lang_string('forcehide','format_weeksrev'),
+                    'help' => 'forcehide',
+                    'help_component' => 'format_weeksrev',
+                    'element_type' => 'select',
+                    'element_attributes' => array(
+                        array(
+                            0 => new lang_string('forcehidefalse','format_weeksrev'),
+                            1 => new lang_string('forcehidetrue','format_weeksrev')
+                        )
+                    ),
                 )
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);

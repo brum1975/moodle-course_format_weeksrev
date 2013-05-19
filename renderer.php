@@ -90,7 +90,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         $requiredsections = array_slice($allsections, 0, $course->numsections+1);
         $revmodinfo = array_reverse($requiredsections);//reverse sections
         array_unshift($revmodinfo,array_pop($revmodinfo));//move section 0 back to top
-        
         $started = $ended = false;        
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
 
@@ -107,24 +106,21 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                 continue;
             }
             $thissectiondates = course_get_format($course)->get_section_dates($thissection);
+            if($thissectiondates->end<(time() + (7 * 24 * 60 * 60)) && !$ended){
+                if($canviewhidden){
+                    echo '</fieldset>';
+                }
+                $ended = true;
+            } 
             $thefuture = $thissectiondates->start>time();
             if($thefuture && !$started){
-                if($canviewhidden){
+                if($canviewhidden && $course->forcehide == 1){
                     echo '<fieldset id="futureweeks"><legend>'.get_string('futureweeks', 'format_weeksrev').'</legend>';
                     $started = true;
+                } elseif ($canviewhidden && $course->forcehide == 0){
+                    echo '<fieldset id="futureweeks"><legend>'.get_string('futureweeks2', 'format_weeksrev').'</legend>';
+                    $started = true;
                 }
-            }
-            if ($section == 0) {
-                // 0-section is displayed a little different then the others
-                if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
-                    echo $this->section_header($thissection, $course, false, 0);
-                    print_section($course, $thissection, null, null, true, "100%", false, 0);
-                    if ($PAGE->user_is_editing()) {
-                        print_section_add_menus($course, 0, null, false, false, 0);
-                    }
-                    echo $this->section_footer();
-                }
-                continue;
             }
 
             if ($section > $course->numsections) {
@@ -142,17 +138,17 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                 if (!$course->hiddensections && $thissection->available) {
                     echo $this->section_hidden($section);
                 }
-
+ 
                 continue;
             }
 
             if (!$PAGE->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                if ($canviewhidden || !$thefuture){
+                if ($canviewhidden || !$thefuture || !$course->forcehide){
                     // Display section summary only.
                     echo $this->section_summary($thissection, $course, null);
                 }
             } else {
-                if(($canviewhidden && $started && !$ended || $ended) ){
+                if(($canviewhidden && $started && !$ended || $ended || $course->forcehide==0) ){
                     echo $this->section_header($thissection, $course, false, 0);
                     if ($thissection->uservisible) {
                         echo $this->courserenderer->course_section_cm_list($course, $thissection);
@@ -161,12 +157,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
                     echo $this->section_footer();
                 }
             }
-            if($thissectiondates->start<(time() + (7 * 24 * 60 * 60)) && !$ended){
-                if($canviewhidden){
-                    echo '</fieldset>';
-                }
-                $ended = true;
-            }  
         }
         if(!$ended){
             if($canviewhidden){
@@ -193,7 +183,6 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         $modinfo = get_fast_modinfo($course);
         $course = course_get_format($course)->get_course();
 
-        // Can we view the section in question?
         $context = context_course::instance($course->id);
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
         $thissectiondates = course_get_format($course)->get_section_dates($displaysection);
@@ -204,8 +193,9 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         }
 
         // Can we view the section in question?
-        if (!($sectioninfo = $modinfo->get_section_info($displaysection))) {
+        if (!($sectioninfo = $modinfo->get_section_info($displaysection)) || (!$canviewhidden && $thefuture && $course->forcehide)) {
             // This section doesn't exist
+            echo $thefuture.':'.$course->forcehide;
             print_error('unknowncoursesection', 'error', null, $course->fullname);
             return;
         }
@@ -223,15 +213,14 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         // Copy activity clipboard..
         echo $this->course_activity_clipboard($course, $displaysection);
 
+
         // General section if non-empty.
         $thissection = $modinfo->get_section_info(0);
         if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
             echo $this->start_section_list();
             echo $this->section_header($thissection, $course, true, $displaysection);
-            print_section($course, $thissection, $mods, $modnamesused, true, "100%", false, $displaysection);
-            if ($PAGE->user_is_editing()) {
-                print_section_add_menus($course, 0, $modnames, false, false, $displaysection);
-            }
+            echo $this->courserenderer->course_section_cm_list($course, $thissection, $displaysection);
+            echo $this->courserenderer->course_section_add_cm_control($course, 0, $displaysection);
             echo $this->section_footer();
             echo $this->end_section_list();
         }
@@ -245,44 +234,40 @@ class format_weeksrev_renderer extends format_section_renderer_base {
         echo html_writer::start_tag('div', array('class' => 'single-section'));
 
         // Title with section navigation links.
-        $sectionnavlinks = $this->get_nav_links($course, $sections, $displaysection);
+        $sectionnavlinks = $this->get_nav_links($course, $modinfo->get_section_info_all(), $displaysection);
         $sectiontitle = '';
         $sectiontitle .= html_writer::start_tag('div', array('class' => 'section-navigation header headingblock'));
         $sectiontitle .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
         $sectiontitle .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
         // Title attributes
         $titleattr = 'mdl-align title';
-        if (!$sections[$displaysection]->visible) {
+        if (!$thissection->visible) {
             $titleattr .= ' dimmed_text';
         }
-        $sectiontitle .= html_writer::tag('div', get_section_name($course, $sections[$displaysection]), array('class' => $titleattr));
+        $sectiontitle .= html_writer::tag('div', get_section_name($course, $displaysection), array('class' => $titleattr));
         $sectiontitle .= html_writer::end_tag('div');
         echo $sectiontitle;
-
+        
         // Now the list of sections..
         echo $this->start_section_list();
 
-        // The requested section page.
-        $thissection = $sections[$displaysection];
         echo $this->section_header($thissection, $course, true, $displaysection);
         // Show completion help icon.
         $completioninfo = new completion_info($course);
         echo $completioninfo->display_help_icon();
 
-        print_section($course, $thissection, $mods, $modnamesused, true, '100%', false, $displaysection);
-        if ($PAGE->user_is_editing()) {
-            print_section_add_menus($course, $displaysection, $modnames, false, false, $displaysection);
-        }
+        echo $this->courserenderer->course_section_cm_list($course, $thissection, $displaysection);
+        echo $this->courserenderer->course_section_add_cm_control($course, $displaysection, $displaysection);
         echo $this->section_footer();
         echo $this->end_section_list();
 
         // Display section bottom navigation.
-        $courselink = html_writer::link(course_get_url($course), get_string('returntomaincoursepage'));
         $sectionbottomnav = '';
         $sectionbottomnav .= html_writer::start_tag('div', array('class' => 'section-navigation mdl-bottom'));
         $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['previous'], array('class' => 'mdl-left'));
         $sectionbottomnav .= html_writer::tag('span', $sectionnavlinks['next'], array('class' => 'mdl-right'));
-        $sectionbottomnav .= html_writer::tag('div', $courselink, array('class' => 'mdl-align'));
+        $sectionbottomnav .= html_writer::tag('div', $this->section_nav_selection($course, $sections, $displaysection),
+            array('class' => 'mdl-align'));
         $sectionbottomnav .= html_writer::end_tag('div');
         echo $sectionbottomnav;
 
@@ -305,12 +290,14 @@ class format_weeksrev_renderer extends format_section_renderer_base {
      */
     protected function get_nav_links($course, $sections, $sectionno) {
         // FIXME: This is really evil and should by using the navigation API.
+        $course = course_get_format($course)->get_course();
         $canviewhidden = has_capability('moodle/course:viewhiddensections', context_course::instance($course->id))
             or !$course->hiddensections;
 
         $links = array('previous' => '', 'next' => '');
         $back = $sectionno - 1;
         while ($back > 0 and empty($links['previous'])) {
+            
             if ($canviewhidden || $sections[$back]->uservisible) {
                 $params = array();
                 if (!$sections[$back]->visible) {
@@ -325,9 +312,9 @@ class format_weeksrev_renderer extends format_section_renderer_base {
 
         $forward = $sectionno + 1;
         while ($forward <= $course->numsections and empty($links['next'])) {
-                $nextsectiondates = course_get_format($course)->get_section_dates($sections[$forward]);
-            $shownext = $nextsectiondates->start<time();
-            if($shownext || $canviewhidden){
+            $nextsectiondates = course_get_format($course)->get_section_dates($sections[$forward]);
+            $shownext = ($nextsectiondates->start<time()|| !$course->forcehide);
+            if($shownext || $canviewhidden){           
                 if ($canviewhidden || $sections[$forward]->uservisible) {
                     $params = array();
                     if (!$sections[$forward]->visible) {
@@ -340,6 +327,43 @@ class format_weeksrev_renderer extends format_section_renderer_base {
             }
             $forward++;
         }
+
         return $links;
     }
+
+    /**
+     * Generate the html for the 'Jump to' menu on a single section page.
+     *
+     * @param stdClass $course The course entry from DB
+     * @param array $sections The course_sections entries from the DB
+     * @param $displaysection the current displayed section number.
+     *
+     * @return string HTML to output.
+     */
+    protected function section_nav_selection($course, $sections, $displaysection) {
+        global $CFG;
+        $o = '';
+        $sectionmenu = array();
+        $sectionmenu[course_get_url($course)->out(false)] = get_string('maincoursepage');
+        $modinfo = get_fast_modinfo($course);
+        $section = 1;
+        while ($section <= $course->numsections) {
+            $nextsectiondates = course_get_format($course)->get_section_dates($section);
+            $shownext = ($nextsectiondates->start<time() || !$course->forcehide);
+            $thissection = $modinfo->get_section_info($section);
+            $showsection = $thissection->uservisible or !$course->hiddensections;
+            if (($showsection && $shownext) && ($section != $displaysection) && ($url = course_get_url($course, $section))) {
+                $sectionmenu[$url->out(false)] = get_section_name($course, $section);
+            }
+            $section++;
+        }
+
+        $select = new url_select($sectionmenu, '', array('' => get_string('jumpto')));
+        $select->class = 'jumpmenu';
+        $select->formid = 'sectionmenu';
+        $o .= $this->output->render($select);
+
+        return $o;
+    }
+
 }
